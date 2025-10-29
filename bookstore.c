@@ -1,0 +1,217 @@
+#include <stdio.h>  // Load library untuk input output
+#include <string.h> // Load library untuk function proses string
+#include <stdlib.h> // Load library untuk function alokasi memori
+
+#define DATABUKU "databuku.txt"   // Constant variable untuk menyimpan nama file data buku
+#define DATASALES "datasales.txt" // Constant variable untuk menyimpan nama file data penjualan
+
+struct Book // Mendefinisikan structure buku yang digunakan untuk create data buku
+{
+    char kode[15];
+    char judul[100];
+    char jenis[100];
+    float harga;
+};
+
+struct Sales // Mendefinisikan structure penjualan yang digunakan untuk create data penjualan
+{
+    char kodebuku[15];
+    int qty;
+    float harga;
+};
+
+// Function untuk menghapus enter pada string
+void removeEnter(char *s)
+{
+    char *newline_pos = strchr(s, '\n');
+
+    if (newline_pos != NULL)
+    {
+        *newline_pos = '\0';
+    }
+}
+
+// Function untuk mengambil kode buku terakhir
+char *getBookCode(char *buffer)
+{
+    if (!buffer || buffer[0] == '\0')
+    {
+        return NULL;
+    }
+
+    char *tab = strchr(buffer, '|');   // Mendapatkan index paling awal karakter |
+    size_t code_length = tab - buffer; // Digunakan untuk mendapatkan panjang kode buku dari buffer
+
+    char *code = (char *)malloc(code_length + 1); // Mengalokasikan memori berdasarkan panjang kode buku
+    strncpy(code, buffer, code_length);           // Copy kode buku dari buffer ke variable code
+    code[code_length] = '\0';
+
+    return code;
+}
+
+char *generateBookCode(char *kodeterakhir)
+{
+    if (!kodeterakhir) // Jika kode terakhir tidak ditemukan
+    {
+        char *new_code = (char *)malloc(strlen("BK") + 3 + 1); // Alokasi memori untuk kode baru
+        if (new_code)
+        {
+            sprintf(new_code, "%s%0*d", "BK", 3, 1); // Membuat kode buku BK001
+        }
+        return new_code;
+    }
+    char *num_str = kodeterakhir + strlen("BK"); // Menyimpan digit dari kode buku
+    int last_number = atoi(num_str);             // Konversi digit dari kode buku yang awalnya string menjadi int
+
+    int next_number = last_number + 1;
+
+    size_t new_code_len = strlen("BK") + 3;
+    char *new_code = (char *)malloc(new_code_len + 1); // Alokasi memori untuk kode baru
+
+    sprintf(new_code, "%s%0*d", "BK", 3, next_number); // Menyimpan kode baru ke variable new_code
+
+    return new_code;
+}
+
+void addBook()
+{
+    FILE *file;       // Deklarasi variable yang nantinya untuk R file databuku.txt
+    struct Book buku; // Deklarasi structur buku
+    char buffer[150];
+    char *kodeterakhir;
+    char *kodeterbaru;
+    file = fopen(DATABUKU, "r"); // membuka file databuku.txt dengan mode read
+
+    if (file == NULL)
+    {
+        printf("File %s tidak bisa diakses", DATABUKU);
+    }
+    else
+    {
+        while (fgets(buffer, sizeof(buffer), file) != NULL) // looping untuk membaca data buku per line
+        {
+            buffer[strcspn(buffer, "\n")] = 0; // merubah enter pada buffer menjadi \0
+            if (buffer[0] == '\0')             // jika buffer kosong, maka langsung skip
+            {
+                continue;
+            }
+            kodeterbaru = getBookCode(buffer); // Panggil getBookCode untuk mendapatkan kode buku terakhir
+            if (kodeterbaru)
+            {
+                // jika kode terbaru tidak NULL, maka membebaskan alokasi memori kodeterakhir dan mengisi variable kodeterakhir dengan kode terbaru
+                free(kodeterakhir);
+                kodeterakhir = kodeterbaru;
+            }
+        }
+        fclose(file);                                      // menutup file data buku dengan mode read
+        strcpy(buku.kode, generateBookCode(kodeterakhir)); // generate kode buku baru
+        free(kodeterakhir);                                // membebaskan alokasi memori kode terakhir
+        file = fopen(DATABUKU, "a");                       // membuka file databuku dengan mode append
+        if (file == NULL)
+        {
+            // jika file berisi null, maka dipastikan file belum ada dan langsung generate file databuku menggunakan mode w
+            printf("File %s tidak bisa diakses", DATABUKU);
+        }
+        else
+        {
+            // Start input judul buku, jenis buku dan harga
+            puts("Masukkan Data Buku");
+            puts("--------------------");
+            printf("Masukkan judul buku: ");
+            fgets(buku.judul, 100, stdin);
+
+            printf("Masukkan jenis buku: ");
+            fgets(buku.jenis, 100, stdin);
+
+            printf("Masukkan harga buku: ");
+            scanf("%f", &buku.harga);
+            // End input judul buku, jenis buku dan harga
+            removeEnter(buku.judul);                                                         // Hapus enter pada judul buku
+            removeEnter(buku.jenis);                                                         // Hapus enter pada jenis buku
+            fprintf(file, "%s|%s|%s|%.2f\n", buku.kode, buku.judul, buku.jenis, buku.harga); // Simpan data buku ke file databuku
+            puts("Data buku berhasil tersimpan!");
+            fclose(file); // tutup file databuku
+        }
+    }
+}
+
+void addSales()
+{
+    FILE *file; // Deklarasi variable yang nantinya untuk R file databuku.txt
+    struct Sales sales; // Deklarasi structur sales
+    char buffer[150];
+    char *kodeterbaru;
+    char *kodeterakhir;
+    float hargabuku = 0;
+    file = fopen(DATABUKU, "r"); // Membuka file databuku.txt
+
+    if (file == NULL)
+    {
+        printf("File %s tidak bisa diakses", DATABUKU);
+    }
+    else
+    {
+        // Start input penjualan
+        puts("Masukkan Data Penjualan");
+        puts("--------------------");
+        printf("Masukkan kode buku: ");
+        scanf("%s", sales.kodebuku);
+
+        printf("Masukkan Qty Penjualan: ");
+        scanf("%d", &sales.qty);
+        // End input penjualan
+
+        while (fgets(buffer, sizeof(buffer), file) != NULL) // looping untuk membaca data buku per line
+        {
+            buffer[strcspn(buffer, "\n")] = 0; // merubah enter pada buffer menjadi \0
+            if (buffer[0] == '\0')             // jika buffer kosong, maka langsung skip
+            {
+                continue;
+            }
+            kodeterbaru = getBookCode(buffer); // Panggil getBookCode untuk mendapatkan kode buku terakhir
+            if (kodeterbaru)
+            {
+                // jika kode terbaru tidak NULL, maka membebaskan alokasi memori kodeterakhir dan mengisi variable kodeterakhir dengan kode terbaru
+                free(kodeterakhir);
+                kodeterakhir = kodeterbaru;
+            }
+            if (strcmp(kodeterakhir, sales.kodebuku) == 0)
+            {
+                // Jika kodeterakhir sama dengan kode yang diinput, maka harga pada databuku.txt akan disimpan pada hargabuku dan looping akan break atau berhenti
+                char *last_delimiter = strrchr(buffer, '|');
+                char *price_start = last_delimiter + 1;
+                hargabuku = atof(price_start);
+                break;
+            }
+        }
+        fclose(file); // close file databuku.txt
+        free(kodeterakhir); // membebaskan alokasi memori kode terakhir
+        if (hargabuku > 0)
+        {
+            // Jika harga buku lebih dari 0 maka data penjualan akan langsung diinput ke datasales.txt
+            sales.harga = hargabuku;
+            file = fopen(DATASALES, "a");
+            if (file == NULL)
+            {
+                printf("File %s tidak bisa diakses", DATASALES);
+            }
+            else
+            {
+                fprintf(file, "%s|%d|%.2f\n", sales.kodebuku, sales.qty, (sales.harga * sales.qty));
+                puts("Transaksi berhasil dicatat");
+                fclose(file);
+            }
+        }
+        else
+        {
+            puts("Kode buku tidak ditemukan");
+        }
+    }
+}
+
+int main()
+{
+    // addBook();
+    // addSales();
+    return 0;
+}
