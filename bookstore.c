@@ -209,9 +209,48 @@ void addSales()
     }
 }
 
+void viewBooks() {
+    FILE *file = fopen(DATABUKU, "r");
+    if (!file) {
+        printf("File %s tidak bisa diakses atau belum ada data.\n", DATABUKU);
+        return;
+    }
+
+    struct Book buku;
+    char buffer[200];
+
+    printf("\n=== DAFTAR BUKU ===\n");
+    printf("%-10s | %-30s | %-20s | %-15s\n", "Kode", "Judul", "Jenis", "Harga");
+    printf("----------------------------------------------------------------------------\n");
+
+    while (fgets(buffer, sizeof(buffer), file)) {
+        buffer[strcspn(buffer, "\n")] = 0; 
+        if (buffer[0] == '\0') continue;
+
+        char *token = strtok(buffer, "|");
+        if (token) strcpy(buku.kode, token);
+
+        token = strtok(NULL, "|");
+        if (token) strcpy(buku.judul, token);
+
+        token = strtok(NULL, "|");
+        if (token) strcpy(buku.jenis, token);
+
+        token = strtok(NULL, "|");
+        if (token) buku.harga = atof(token);
+
+        printf("%-10s | %-30s | %-20s | Rp. %.2f\n",
+               buku.kode, buku.judul, buku.jenis, buku.harga);
+    }
+
+    fclose(file);
+    printf("----------------------------------------------------------------------------\n");
+}
+
 int main()
 {
     // addBook();
     // addSales();
+    // viewBooks();
     return 0;
 }
