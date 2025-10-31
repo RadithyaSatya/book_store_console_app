@@ -109,7 +109,6 @@ void addBook()
         file = fopen(DATABUKU, "a");                       // membuka file databuku dengan mode append
         if (file == NULL)
         {
-            // jika file berisi null, maka dipastikan file belum ada dan langsung generate file databuku menggunakan mode w
             printf("File %s tidak bisa diakses", DATABUKU);
         }
         else
