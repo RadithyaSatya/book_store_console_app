@@ -60,14 +60,15 @@ void addBook()
     char buffer[150];
     char *kodeterakhir;
     char *kodeterbaru;
-    file = fopen(DATABUKU, "r"); // membuka file databuku.txt dengan mode read
-
+    file = fopen(DATABUKU, "a"); // buka databuku.txt dengan mode a untuk get error system dan membuat file jika file tidak ada
     if (file == NULL)
     {
         printf("File %s tidak bisa diakses", DATABUKU);
     }
     else
     {
+        fclose(file); // close file mode a
+        file = fopen("databuku.txt", "r"); // open file ke mode read untuk get kode buku terakhir
         while (fgets(buffer, sizeof(buffer), file) != NULL) // looping untuk membaca data buku per line
         {
             buffer[strcspn(buffer, "\n")] = 0; // merubah enter pada buffer menjadi \0
@@ -116,7 +117,7 @@ void addBook()
 
 void addSales()
 {
-    FILE *file; // Deklarasi variable yang nantinya untuk R file databuku.txt
+    FILE *file;         // Deklarasi variable yang nantinya untuk R file databuku.txt
     struct Sales sales; // Deklarasi structur sales
     char buffer[150];
     char *kodeterbaru;
@@ -163,7 +164,7 @@ void addSales()
                 break;
             }
         }
-        fclose(file); // close file databuku.txt
+        fclose(file);       // close file databuku.txt
         free(kodeterakhir); // membebaskan alokasi memori kode terakhir
         if (hargabuku > 0)
         {
@@ -188,9 +189,11 @@ void addSales()
     }
 }
 
-void viewBooks() {
+void viewBooks()
+{
     FILE *file = fopen(DATABUKU, "r");
-    if (!file) {
+    if (!file)
+    {
         printf("File %s tidak bisa diakses atau belum ada data.\n", DATABUKU);
         return;
     }
@@ -202,21 +205,27 @@ void viewBooks() {
     printf("%-10s | %-30s | %-20s | %-15s\n", "Kode", "Judul", "Jenis", "Harga");
     printf("----------------------------------------------------------------------------\n");
 
-    while (fgets(buffer, sizeof(buffer), file)) {
-        buffer[strcspn(buffer, "\n")] = 0; 
-        if (buffer[0] == '\0') continue;
+    while (fgets(buffer, sizeof(buffer), file))
+    {
+        buffer[strcspn(buffer, "\n")] = 0;
+        if (buffer[0] == '\0')
+            continue;
 
         char *token = strtok(buffer, "|");
-        if (token) strcpy(buku.kode, token);
+        if (token)
+            strcpy(buku.kode, token);
 
         token = strtok(NULL, "|");
-        if (token) strcpy(buku.judul, token);
+        if (token)
+            strcpy(buku.judul, token);
 
         token = strtok(NULL, "|");
-        if (token) strcpy(buku.jenis, token);
+        if (token)
+            strcpy(buku.jenis, token);
 
         token = strtok(NULL, "|");
-        if (token) buku.harga = atof(token);
+        if (token)
+            buku.harga = atof(token);
 
         printf("%-10s | %-30s | %-20s | Rp. %.2f\n",
                buku.kode, buku.judul, buku.jenis, buku.harga);
