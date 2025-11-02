@@ -58,8 +58,8 @@ void addBook()
     FILE *file;       // Deklarasi variable yang nantinya untuk R file databuku.txt
     struct Book buku; // Deklarasi structur buku
     char buffer[150];
-    char *kodeterakhir;
-    char *kodeterbaru;
+    char *kodeterakhir = NULL; // inisialisasi biar gak ada pointer sampah
+    char *kodeterbaru = NULL;
     file = fopen(DATABUKU, "a"); // buka databuku.txt dengan mode a untuk get error system dan membuat file jika file tidak ada
     if (file == NULL)
     {
@@ -79,14 +79,15 @@ void addBook()
             kodeterbaru = getBookCode(buffer); // Panggil getBookCode untuk mendapatkan kode buku terakhir
             if (kodeterbaru)
             {
-                // jika kode terbaru tidak NULL, maka membebaskan alokasi memori kodeterakhir dan mengisi variable kodeterakhir dengan kode terbaru
-                free(kodeterakhir);
+                if (kodeterakhir != NULL) // hindari free pointer kosong
+                    free(kodeterakhir);
                 kodeterakhir = kodeterbaru;
             }
         }
         fclose(file);                                      // menutup file data buku dengan mode read
         strcpy(buku.kode, generateBookCode(kodeterakhir)); // generate kode buku baru
-        free(kodeterakhir);                                // membebaskan alokasi memori kode terakhir
+        if (kodeterakhir != NULL)
+            free(kodeterakhir); // bebasin memori terakhir kalau ada
         file = fopen(DATABUKU, "a");                       // membuka file databuku dengan mode append
         if (file == NULL)
         {
@@ -105,6 +106,7 @@ void addBook()
 
             printf("Masukkan harga buku: ");
             scanf("%f", &buku.harga);
+            getchar(); // buang newline biar gak ganggu input berikutnya
             // End input judul buku, jenis buku dan harga
             removeEnter(buku.judul);                                                         // Hapus enter pada judul buku
             removeEnter(buku.jenis);                                                         // Hapus enter pada jenis buku
@@ -120,8 +122,8 @@ void addSales()
     FILE *file;         // Deklarasi variable yang nantinya untuk R file databuku.txt
     struct Sales sales; // Deklarasi structur sales
     char buffer[150];
-    char *kodeterbaru;
-    char *kodeterakhir;
+    char *kodeterbaru = NULL;
+    char *kodeterakhir = NULL; // inisialisasi supaya gak langsung di-free
     float hargabuku = 0;
     file = fopen(DATABUKU, "r"); // Membuka file databuku.txt
 
@@ -151,11 +153,11 @@ void addSales()
             kodeterbaru = getBookCode(buffer); // Panggil getBookCode untuk mendapatkan kode buku terakhir
             if (kodeterbaru)
             {
-                // jika kode terbaru tidak NULL, maka membebaskan alokasi memori kodeterakhir dan mengisi variable kodeterakhir dengan kode terbaru
-                free(kodeterakhir);
+                if (kodeterakhir != NULL)
+                    free(kodeterakhir); // pastiin gak free pointer kosong
                 kodeterakhir = kodeterbaru;
             }
-            if (strcmp(kodeterakhir, sales.kodebuku) == 0)
+            if (kodeterakhir && strcmp(kodeterakhir, sales.kodebuku) == 0)
             {
                 // Jika kodeterakhir sama dengan kode yang diinput, maka harga pada databuku.txt akan disimpan pada hargabuku dan looping akan break atau berhenti
                 char *last_delimiter = strrchr(buffer, '|');
@@ -164,8 +166,9 @@ void addSales()
                 break;
             }
         }
-        fclose(file);       // close file databuku.txt
-        free(kodeterakhir); // membebaskan alokasi memori kode terakhir
+        fclose(file);       
+        if (kodeterakhir != NULL)
+            free(kodeterakhir); // bebasin memori terakhir
         if (hargabuku > 0)
         {
             // Jika harga buku lebih dari 0 maka data penjualan akan langsung diinput ke datasales.txt

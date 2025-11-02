@@ -1,3 +1,14 @@
+/*
+    Project Practicum - Bookstore
+
+    Anggota Kelompok:
+    1. ARIFIANTO
+    2. MUHAMMAD PERMADANI
+    3. MUHAMMAD RADITHYA SATYA GANTARA
+    4. RENATA RAMADHANYANDRA
+    5. YUDHO AHMAD FAHREZA
+*/
+
 #include "bookstore.h"
 
 void displayMenu() {
