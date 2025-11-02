@@ -1,71 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-typedef struct
-{
-  char kode[15];
-  char judul[100];
-  char kategori[100];
-  float harga;
-} Buku;
+#include "bookstore.h"
 
 // deklarasi fungsi-fungsi
-int readBooksFromFile(Buku **buku, const char *filename);
 void deleteBook();
-
-int readBooksFromFile(Buku **buku, const char *filename)
-{
-  FILE *file;
-  int count = 0;
-  int kapasitas = 10;
-
-  // alokasi awal
-  *buku = malloc(kapasitas * sizeof(Buku));
-  if (!*buku)
-  {
-    printf("Gagal alokasi memori!\n");
-    return 0;
-  }
-
-  // buka file
-  file = fopen(filename, "r");
-  if (!file)
-  {
-    printf("File %s tidak ditemukan!\n", filename);
-    free(*buku);
-    *buku = NULL;
-    return 0;
-  }
-
-  // baca baris demi baris
-  while (fscanf(file, "%[^|]|%[^|]|%[^|]|%f\n",
-                (*buku)[count].kode,
-                (*buku)[count].judul,
-                (*buku)[count].kategori,
-                &(*buku)[count].harga) == 4)
-  {
-    count++;
-
-    // kalau penuh, gandakan kapasitas
-    if (count >= kapasitas)
-    {
-      kapasitas *= 2;
-      Buku *temp = realloc(*buku, kapasitas * sizeof(Buku));
-      if (!temp)
-      {
-        printf("Gagal menambah kapasitas memori!\n");
-        free(*buku);
-        fclose(file);
-        *buku = NULL;
-        return 0;
-      }
-      *buku = temp;
-    }
-  }
-  fclose(file);
-  return count;
-}
 
 void deleteBook()
 {
@@ -146,10 +82,4 @@ void deleteBook()
 
   // hapus alokasi memori dinamis setelah selesai
   free(buku);
-}
-
-int main()
-{
-  deleteBook();
-  return 0;
 }

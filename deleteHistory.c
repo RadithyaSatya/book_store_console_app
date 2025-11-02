@@ -1,14 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#define DATASALES "datasales.txt"
-
-struct Sales {
-    char kodebuku[15];
-    int qty;
-    float harga;
-};
+#include "bookstore.h"
 
 void deleteHistory()
 {
@@ -122,10 +112,4 @@ void deleteHistory()
     printf("\nData Successfully delete..\n");
 
     free(hist);
-}
-
-int main()
-{
-    deleteHistory();
-    return 0;
 }

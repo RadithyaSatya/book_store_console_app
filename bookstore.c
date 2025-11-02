@@ -1,24 +1,4 @@
-#include <stdio.h>  // Load library untuk input output
-#include <string.h> // Load library untuk function proses string
-#include <stdlib.h> // Load library untuk function alokasi memori
-
-#define DATABUKU "databuku.txt"   // Constant variable untuk menyimpan nama file data buku
-#define DATASALES "datasales.txt" // Constant variable untuk menyimpan nama file data penjualan
-
-struct Book // Mendefinisikan structure buku yang digunakan untuk create data buku
-{
-    char kode[15];
-    char judul[100];
-    char jenis[100];
-    float harga;
-};
-
-struct Sales // Mendefinisikan structure penjualan yang digunakan untuk create data penjualan
-{
-    char kodebuku[15];
-    int qty;
-    float harga;
-};
+#include "bookstore.h"
 
 // Function untuk menghapus enter pada string
 void removeEnter(char *s)
@@ -244,12 +224,4 @@ void viewBooks() {
 
     fclose(file);
     printf("----------------------------------------------------------------------------\n");
-}
-
-int main()
-{
-    // addBook();
-    // addSales();
-    // viewBooks();
-    return 0;
 }
